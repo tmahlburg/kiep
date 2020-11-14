@@ -61,11 +61,11 @@ func archiveArticle(url string, tags []string) {
 	fullPageCh := make(chan []byte)
 	go archiveFullPage(url, fullPageCh)
 
-	headerPath := "header.html"
+	headerPath := "static/header.html"
 	headerCh := make(chan string)
 	go readFile(headerPath, headerCh)
 
-	footerPath := "footer.html"
+	footerPath := "static/footer.html"
 	footerCh := make(chan string)
 	go readFile(footerPath, footerCh)
 
