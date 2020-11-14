@@ -1,4 +1,5 @@
 /*! concrete.css v1.3.0 | MIT License | github.com/louismerlin/concrete.css/ */
+/* slightly edited to apply to <article> tags. See A Cool Container section */
 
 /* The Basics */
 
@@ -34,7 +35,7 @@ img {
 
 /* A Cool Container */
 
-.container {
+.container, article {
   margin: 0 auto;
   max-width: 66rem;
   padding: 0 1rem;

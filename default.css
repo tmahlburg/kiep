@@ -1,0 +1,63 @@
+main {
+  max-width: 95ch;
+  padding: 2ch;
+  margin: auto;
+  text-align: center;
+}
+p {
+  font-family: "Noto Serif", Serif;
+  font-size: 20px;
+  text-align: justify;
+}
+h1 {
+  font-size: 40px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 25px;
+}
+h4 {
+  font-size: 20px;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+hr {
+  border: none;
+  height: 0.3rem;
+}
+/* source: https://github.com/louismerlin/concrete.css */
+table {
+  width: 100%;
+  border-spacing: 0;
+}
+td, th {
+  padding: 0.6rem 0;
+}
+td {
+  border-bottom: 0.1rem solid;
+}
+th {
+  border-bottom: 0.3rem solid;
+  text-align: left;
+}
+blockquote, pre {
+  border-left: 0.3rem solid;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 1rem 1.5rem;
+  overflow-y: hidden;
+}
+pre {
+  border: 0.1rem dotted;
+  border-left: 0.3rem solid;
+}
+pre > code {
+  padding: 1rem 1.4rem;
+  font-size: 1.6rem;
+  white-space: pre;
+  display: block;
+}
