@@ -1,2 +1,2 @@
 # kip
-Command line to to keep online articles forever.
+Command line tool to to keep online articles forever.
