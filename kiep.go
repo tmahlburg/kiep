@@ -8,13 +8,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"sync"
 	"time"
 
 	readability "github.com/go-shiori/go-readability"
-	"github.com/tmahlburg/obelisk"
-	archiveorg "github.com/wabarc/archive.org/pkg"
+	"github.com/go-shiori/obelisk"
+	ia "github.com/wabarc/archive.org/pkg"
 	"golang.org/x/net/html"
 )
 
@@ -29,6 +30,8 @@ func main() {
 				printHelp()
 				os.Exit(1)
 			}
+		/*case "init":
+			installStatic()*/
 		case "help":
 			printHelp()
 		default:
@@ -61,11 +64,13 @@ func archiveArticle(url string, tags []string) {
 	fullPageCh := make(chan []byte)
 	go archiveFullPage(url, fullPageCh)
 
-	headerPath := "static/header.html"
+	baseDir := getArchiveDir()
+
+	headerPath := path.Join(baseDir, "static/header.html")
 	headerCh := make(chan string)
 	go readFile(headerPath, headerCh)
 
-	footerPath := "static/footer.html"
+	footerPath := path.Join(baseDir, "static/footer.html")
 	footerCh := make(chan string)
 	go readFile(footerPath, footerCh)
 
@@ -80,7 +85,7 @@ func archiveArticle(url string, tags []string) {
 	plain, stripped := makeReadable(url, page_reader)
 
 	title := "<h1>" + metaData.title + "</h1><hr>"
-	stripped = fmt.Sprintf(<-headerCh, metaData.title) + title +  stripped + <-footerCh
+	stripped = fmt.Sprintf(<-headerCh, metaData.title) + title + stripped + <-footerCh
 	metaData.archivedUrl = <-snapShotCh
 
 	fileContent := make(map[string][]byte)
@@ -88,8 +93,8 @@ func archiveArticle(url string, tags []string) {
 	fileContent["stripped.html"] = []byte(stripped)
 	fileContent["full_page.html"] = <-fullPageCh
 	fileContent[".meta"] = []byte(createMetaFile(&metaData))
-	dirName := metaData.date.Format("2006-02-01") + "-" + metaData.title
-	saveToDisk(&fileContent, dirName)
+	destDir := path.Join(baseDir, metaData.date.Format("2006-02-01")+"-"+metaData.title)
+	saveToDisk(&fileContent, destDir)
 }
 
 func downloadPage(url string) []byte {
@@ -155,7 +160,7 @@ func makeReadable(url string, page io.Reader) (string, string) {
 }
 
 func createSnapshot(url string, c chan string) {
-	var wbrc archiveorg.Archiver
+	var wbrc ia.Archiver
 	result, err := wbrc.Wayback([]string{url})
 	if err != nil {
 		panic(err)
@@ -179,19 +184,19 @@ func archiveFullPage(url string, c chan []byte) {
 	c <- result
 }
 
-func saveToDisk(fileContent *map[string][]byte, dirName string) {
-	os.MkdirAll(dirName, os.ModePerm)
+func saveToDisk(fileContent *map[string][]byte, destDir string) {
+	os.MkdirAll(destDir, os.ModePerm)
 	// write given files
 	var wg sync.WaitGroup
 	wg.Add(len(*fileContent))
 	for fileName, content := range *fileContent {
-		go func(fileName string, content []byte, dirName string) {
+		go func(fileName string, content []byte, destDir string) {
 			defer wg.Done()
-			err := ioutil.WriteFile(dirName+"/"+fileName, content, 0644)
+			err := ioutil.WriteFile(path.Join(destDir, fileName), content, 0644)
 			if err != nil {
 				panic(err)
 			}
-		}(fileName, content, dirName)
+		}(fileName, content, destDir)
 	}
 	wg.Wait()
 }
@@ -209,7 +214,22 @@ func createMetaFile(metaData *article) string {
 func readFile(fileName string, returnCh chan string) {
 	cont, err := ioutil.ReadFile(fileName)
 	if err != nil {
-    	panic(err)
+		panic(err)
 	}
 	returnCh <- string(cont)
 }
+
+func getArchiveDir() string {
+	if dirName := os.Getenv("KIEP_ARCHIVE_DIR"); dirName != "" {
+		return dirName
+	} else if dirName := path.Join(os.Getenv("XDG_DOCUMENTS_DIR"), "kiep"); dirName != "" {
+		return dirName
+	} else {
+		return path.Join(os.Getenv("HOME"), "Documents/kiep")
+	}
+}
+
+/*
+func installStatic() {
+	destDir := getArchiveDir()
+}*/
