@@ -17,6 +17,8 @@ import (
 	"github.com/go-shiori/obelisk"
 	ia "github.com/wabarc/archive.org/pkg"
 	"golang.org/x/net/html"
+
+	"github.com/tmahlburg/kiep/internal/kiep"
 )
 
 func main() {
@@ -25,13 +27,13 @@ func main() {
 		switch os.Args[1] {
 		case "article":
 			if len(os.Args) > 2 {
-				archiveArticle(os.Args[2], os.Args[3:])
+				kiep.ArchiveArticle(os.Args[2], os.Args[3:])
 			} else {
 				printHelp()
 				os.Exit(1)
 			}
-		/*case "init":
-			installStatic()*/
+		case "init":
+			installStatic()
 		case "help":
 			printHelp()
 		default:
@@ -229,7 +231,7 @@ func getArchiveDir() string {
 	}
 }
 
-/*
 func installStatic() {
 	destDir := getArchiveDir()
-}*/
+	os.MkdirAll(destDir)
+}
