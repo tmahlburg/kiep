@@ -1,6 +1,9 @@
-package "kiep"
+package kiep
 
-import "os"
+import (
+	"os"
+	"path"
+)
 
 func getArchiveDir() string {
 	if dirName := os.Getenv("KIEP_ARCHIVE_DIR"); dirName != "" {

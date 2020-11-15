@@ -1,4 +1,23 @@
-package "kiep"
+package kiep
+
+import (
+	"bytes"
+	"context"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path"
+	"strings"
+	"sync"
+	"time"
+
+	readability "github.com/go-shiori/go-readability"
+	"github.com/go-shiori/obelisk"
+	ia "github.com/wabarc/archive.org/pkg"
+	"golang.org/x/net/html"
+)
 
 type article struct {
 	url         string
@@ -169,14 +188,4 @@ func readFile(fileName string, returnCh chan string) {
 		panic(err)
 	}
 	returnCh <- string(cont)
-}
-
-func getArchiveDir() string {
-	if dirName := os.Getenv("KIEP_ARCHIVE_DIR"); dirName != "" {
-		return dirName
-	} else if dirName := path.Join(os.Getenv("XDG_DOCUMENTS_DIR"), "kiep"); dirName != "" {
-		return dirName
-	} else {
-		return path.Join(os.Getenv("HOME"), "Documents/kiep")
-	}
 }
